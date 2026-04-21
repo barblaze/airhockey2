@@ -21,6 +21,9 @@ jobs:
       - name: Install Dependencies
         run: npm install --no-package-lock
 
+        - name: Initialize Android Platform
+        run: npx cap add android
+
       - name: Capacitor Sync
         run: npx cap sync android
 
