@@ -3,6 +3,8 @@ name: Build Android APK
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -12,30 +14,35 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'zulu'
 
-      - name: Install Dependencies
-        run: npm install --no-package-lock
-
-        - name: Initialize Android Platform
+      - name: Initialize Android Platform
         run: npx cap add android
 
-      - name: Capacitor Sync
+      - name: Sync Assets to Android
         run: npx cap sync android
 
-      - name: Build with Gradle
+      - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AirHockey-Debug-APK
+          name: AirHockey-PRO-Debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
-
