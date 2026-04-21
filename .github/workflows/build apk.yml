@@ -19,7 +19,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Install Dependencies
-        run: npm install --no.package-lock
+        run: npm install --no-package-lock
 
       - name: Capacitor Sync
         run: npx cap sync android
