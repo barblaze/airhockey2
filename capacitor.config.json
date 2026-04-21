@@ -1,0 +1,6 @@
+{
+  "appId": "com.akrosport.airhockey",
+  "appName": "Air Hockey PRO",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
