@@ -17,9 +17,19 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Dependencies (Fresh)
-        # Usamos --no-package-lock para evitar errores de integridad manuales
+      - name: Install Dependencies
         run: npm install --no-package-lock
+
+      - name: Prepare Web Assets
+        run: |
+          # Creamos la carpeta www y movemos todo lo necesario allí
+          mkdir -p www
+          # Copiamos index.html y manifest.json (y cualquier .js o .css que tengas)
+          cp index.html www/ 2>/dev/null || true
+          cp manifest.json www/ 2>/dev/null || true
+          cp *.js www/ 2>/dev/null || true
+          cp *.css www/ 2>/dev/null || true
+          cp -r assets www/ 2>/dev/null || true
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
