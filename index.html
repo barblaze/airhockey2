@@ -340,6 +340,7 @@ function startGame(mode,diff){
   cM=mode||cM;cD=diff||cD;gP++;
   var isDM=gP%5===0;
   for(var _pr=0;_pr<POOL_SZ;_pr++)ptPool[_pr].active=false;
+  if(RAF)cancelAnimationFrame(RAF);G=null;
   G={W:W,H:H,mode:cM,aiDiff:cD,pucks:[mkPk(null)],
     p1:{x:W/2,y:H*.82,vx:0,vy:0,touchX:null,touchY:null},p2:{x:W/2,y:H*.18,vx:0,vy:0,touchX:null,touchY:null},
     sc:{p1:0,p2:0},cd:80,pups:[],spT:PSP,bpT:420+~~(Math.random()*300),
@@ -426,8 +427,12 @@ function exFr(){
 }
 
 function loop(){
-  if(!G)return;RAF=requestAnimationFrame(loop);
-  if(paused){X.fillStyle='#04060f88';X.fillRect(0,0,W,H);X.fillStyle='#fff';X.font='bold '+~~(W*.07)+'px Courier New,monospace';X.textAlign='center';X.fillText('PAUSA',W/2,H/2);return;}
+  if(!G) return;
+  if(paused){
+    X.fillStyle='#04060f88';X.fillRect(0,0,W,H);X.fillStyle='#fff';
+    X.font='bold '+~~(W*.07)+'px Courier New,monospace';X.textAlign='center';X.fillText('PAUSA',W/2,H/2);
+    return;
+  }
   var s=G,ef=s.ef,dm=ef.dm.on,sm=ef.sm.on;
   Object.keys(ef).forEach(k=>{if(ef[k].on){ef[k].t--;if(ef[k].t<=0){ef[k].on=false;if(k==='bp'){s.hLv=0;s.pucks.forEach(p=>p.r=PRB);}if(k==='mp')s.pucks.splice(1);if(k==='dm')stCh();}}});
   if(s.isDM&&!s.dmD&&!s.cd){s.pups.push({id:'dm',type:'DEATH_MATCH',x:W/2,y:H/2,age:0,ttl:PTL});s.dmD=true;sLa();}
@@ -473,6 +478,7 @@ function loop(){
   });
   if(ef.bg.on){if(ef.bg.tg==='p2')dBar(W/2,H*.8,'ARCO+',ef.bg.t/ef.bg.mx,'#ffdd00',false);else dBar(W/2,H*.2,'ARCO+',ef.bg.t/ef.bg.mx,'#ffdd00',true);}
   if(s.cd>0){X.save();X.fillStyle='rgba(4,6,15,0.5)';X.fillRect(0,0,W,H);X.restore();}
+  if(G)RAF=requestAnimationFrame(loop);
 }
 
 function showScr(name){
@@ -514,7 +520,7 @@ document.getElementById('bOM').onclick=()=>showScr('sM');
 document.getElementById('ob').onclick=()=>document.getElementById('op').classList.toggle('hid');
 document.getElementById('bPs').onclick=()=>{setPause(!paused);closeOptions();};
 document.getElementById('bSd').onclick=()=>{togMute();closeOptions();};
-document.getElementById('bMn').onclick=()=>{showScr('sM');closeOptions();};
+document.getElementById('bMn').onclick=()=>{if(RAF)cancelAnimationFrame(RAF);stCh();G=null;_snap=null;TR.on=false;RAF=null;X.fillStyle='#04060f';X.fillRect(0,0,W,H);showScr('sM');closeOptions();};
 document.getElementById('bCfg').onclick=()=>{updRec();showScr('sCfg');};
 document.getElementById('bRec').onclick=()=>{updRec();showScr('sRec');};
 document.getElementById('bPrac').onclick=()=>{_prac=true;startGame('2p');};
