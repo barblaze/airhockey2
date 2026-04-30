@@ -180,6 +180,43 @@ canvas{position:fixed;top:env(safe-area-inset-top,0px);left:env(safe-area-inset-
   <button id="bClr" class="b re" style="font-size:11px;padding:7px 16px;">BORRAR RÉCORDS</button>
   <button class="b di" id="bRecBk">VOLVER</button>
 </div>
+<div id="sName" class="scr hid">
+  <div style="color:#ffdd00;font-size:clamp(14px,4.5vw,22px);font-weight:bold;text-shadow:0 0 16px #ffdd00;letter-spacing:3px;animation:pu 2s ease-in-out infinite">INGRESA NOMBRE</div>
+  <div id="nDisp" style="color:#ffffff;font-size:clamp(28px,9vw,48px);font-weight:bold;letter-spacing:8px;font-family:monospace;text-shadow:0 0 18px #00ffee;min-width:120px;text-align:center">___</div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:280px">
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="A">A</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="B">B</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="C">C</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="D">D</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="E">E</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="F">F</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="G">G</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="H">H</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="I">I</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="J">J</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="K">K</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="L">L</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="M">M</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="N">N</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="O">O</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="P">P</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="Q">Q</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="R">R</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="S">S</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="T">T</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="U">U</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="V">V</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="W">W</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="X">X</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="Y">Y</button>
+    <button class="b di" style="padding:5px 8px;font-size:12px" data-l="Z">Z</button>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="b gr" id="nOk" style="font-size:12px;padding:7px 18px">OK</button>
+    <button class="b di" id="nDel" style="font-size:12px;padding:7px 18px">BORRAR</button>
+    <button class="b di" id="nCan" style="font-size:12px;padding:7px 18px">SALTAR</button>
+  </div>
+</div>
 
 <script>
 window.addEventListener('DOMContentLoaded',function(){
@@ -213,9 +250,25 @@ var gP=0,wins={p1:0,p2:0},cM='2p',cD='medium',precM=false,pCd=80;
 var TR={on:false,mode:'2p',diff:'medium',bo:3,w:{p1:0,p2:0}};
 var tMode='2p',tBo=3,_snap=null;
 
-var REC={j1:0,cpu:0,streak:0,tourney:0,goals:0};
+var REC={j1:0,cpu:0,streak:0,tourney:0,goals:0,names:[{name:'J1',score:0},{name:'J2',score:0}]};
 (function(){try{var s=localStorage.getItem('airhockey_rec');if(s){var d=JSON.parse(s);Object.assign(REC,d);}}catch(e){}})();
 function saveRec(){try{localStorage.setItem('airhockey_rec',JSON.stringify(REC));}catch(e){}}
+var _nEntry={active:false,player:'',name:'',pos:0,cb:null};
+function startNameEntry(player,cb){
+  _nEntry={active:true,player:player,name:'',pos:0,cb:cb};
+  document.getElementById('nDisp').textContent='___';
+  showScr('sName');
+}
+function addLetter(l){
+  if(_nEntry.pos>=3)return;
+  _nEntry.name+=l;_nEntry.pos++;
+  var d=document.getElementById('nDisp');d.textContent=_nEntry.name+('_'.repeat(3-_nEntry.pos));
+}
+function delLetter(){
+  if(_nEntry.pos<=0)return;
+  _nEntry.name=_nEntry.name.slice(0,-1);_nEntry.pos--;
+  var d=document.getElementById('nDisp');d.textContent=_nEntry.name+('_'.repeat(3-_nEntry.pos));
+}
 
 var padSpeed=1,timeMode=false,timeLimit=60,_prac=false;
 
@@ -304,6 +357,7 @@ function startGame(mode,diff){
 
 function apPU(type,who){
   sU(type);var ef=G.ef,op=who==='p1'?'p2':'p1';
+  var pCfg=PC[type];if(pCfg)shFlash(pCfg.l+'!');
   if(type==='BIG_GOAL'){var d=rd();ef.bg={on:true,tg:op,t:d,mx:d};}
   else if(type==='BIG_PUCK'){G.hLv++;var nr=Math.min(PRB+G.hLv*PRS,PRM);var d=rd();ef.bp={on:true,t:d,mx:d};G.pucks.forEach(function(p){p.r=nr;p.hv=true;});}
   else if(type==='SLOW_MO'){var d=rd();ef.sm={on:true,t:d,mx:d};}
@@ -342,10 +396,10 @@ function endGame(winner,sn){
   stCh();wins[winner]++;setTimeout(sWn,200);
   var gs=sn||G,iC=gs&&gs.mode==='cpu',wc=winner==='p1'?'#00ffee':'#ff00cc',wL=winner==='p1'?'J1':(iC?'CPU':'J2');
   if(_prac){_prac=false;showScr('sM');return;}
-  if(iC&&winner==='p1'){REC.j1++;REC.goals+=gs.sc.p1;if(REC.streak<3)REC.streak=3;saveRec();}
+  if(iC&&winner==='p1'){REC.j1++;REC.goals+=gs.sc.p1;if(REC.streak<3)REC.streak=3;saveRec();checkRecord('p1',gs.sc.p1);}
   else if(iC&&winner==='p2'){REC.cpu++;REC.goals+=gs.sc.p2;if(REC.streak>-3)REC.streak=-3;saveRec();}
-  else if(!iC&&winner==='p1'){REC.j1++;REC.goals+=gs.sc.p1;REC.streak++;if(REC.streak>3)REC.streak=3;saveRec();}
-  else if(!iC&&winner==='p2'){REC.goals+=gs.sc.p2;}
+  else if(!iC&&winner==='p1'){REC.j1++;REC.goals+=gs.sc.p1;REC.streak++;if(REC.streak>3)REC.streak=3;saveRec();checkRecord('p1',gs.sc.p1);}
+  else if(!iC&&winner==='p2'){REC.goals+=gs.sc.p2;REC.streak--;if(REC.streak<-3)REC.streak=-3;saveRec();checkRecord('p2',gs.sc.p2);}
   if(TR.on){
     TR.w[winner]++;var need=Math.ceil(TR.bo/2),over=TR.w[winner]>=need;
     if(over&&iC)REC.tourney++;
@@ -422,12 +476,13 @@ function loop(){
 }
 
 function showScr(name){
-  ['sM','sD','sO','sTr','sSr','sCfg','sRec'].forEach(id=>{document.getElementById(id).classList.toggle('hid',id!==name);});
+  ['sM','sD','sO','sTr','sSr','sCfg','sRec','sName'].forEach(id=>{document.getElementById(id).classList.toggle('hid',id!==name);});
   var ig=name==='game';document.getElementById('h1').classList.toggle('hid',!ig);document.getElementById('h2').classList.toggle('hid',!ig);document.getElementById('ob').classList.toggle('hid',!ig);
 }
 function updHUD(){if(!G)return;document.getElementById('h1').textContent='J1 '+G.sc.p1;document.getElementById('h2').textContent=(G.mode==='cpu'?'CPU':'J2')+' '+G.sc.p2;}
 function setPause(v){paused=v;document.getElementById('bPs').textContent=v?'CONTINUAR':'PAUSAR';}
-function togMute(){muted=!muted;document.getElementById('bSd').textContent=muted?'SONIDO OFF':'SONIDO ON';}
+function togMute(){muted=!muted;var txt=muted?'SONIDO OFF':'SONIDO ON';document.getElementById('bSd').textContent=txt;document.getElementById('bSm').textContent=txt;}
+function closeOptions(){document.getElementById('op').classList.add('hid');}
 
 function movePad(px,py){
   if(!G||paused)return;
@@ -444,23 +499,44 @@ document.getElementById('bMd').onclick=()=>startGame('cpu','medium');
 document.getElementById('bHd').onclick=()=>startGame('cpu','hard');
 document.getElementById('bHC').onclick=()=>startGame('cpu','hardcore');
 document.getElementById('bDk').onclick=()=>showScr('sM');
+document.getElementById('bTm2').onclick=()=>{tMode='2p';document.getElementById('tDA').classList.toggle('hid',tMode==='2p');document.getElementById('tLb').textContent='Torneo: 2 JUGADORES';};
+document.getElementById('bTmC').onclick=()=>{tMode='cpu';document.getElementById('tDA').classList.toggle('hid',tMode==='2p');document.getElementById('tLb').textContent='Torneo: VS CPU';};
+document.getElementById('bB3').onclick=()=>{tBo=3;document.getElementById('tLb').textContent=document.getElementById('tLb').textContent.split('|')[0]+' | Mejor de 3';};
+document.getElementById('bB5').onclick=()=>{tBo=5;document.getElementById('tLb').textContent=document.getElementById('tLb').textContent.split('|')[0]+' | Mejor de 5';};
+document.getElementById('bTBg').onclick=()=>{TR={on:true,mode:tMode,diff:'beginner',bo:tBo,w:{p1:0,p2:0}};startGame(tMode,'beginner');};
+document.getElementById('bTMd').onclick=()=>{TR={on:true,mode:tMode,diff:'medium',bo:tBo,w:{p1:0,p2:0}};startGame(tMode,'medium');};
+document.getElementById('bTHd').onclick=()=>{TR={on:true,mode:tMode,diff:'hard',bo:tBo,w:{p1:0,p2:0}};startGame(tMode,'hard');};
+document.getElementById('bTHC').onclick=()=>{TR={on:true,mode:tMode,diff:'hardcore',bo:tBo,w:{p1:0,p2:0}};startGame(tMode,'hardcore');};
+document.getElementById('bTk').onclick=()=>showScr('sM');
+document.getElementById('bNx').onclick=()=>{if(TR.on){var need=Math.ceil(TR.bo/2);if(TR.w.p1>=need||TR.w.p2>=need){TR.on=false;showScr('sM');return;}startGame(TR.mode,TR.diff);}};
 document.getElementById('bRm').onclick=()=>startGame(cM,cD);
 document.getElementById('bOM').onclick=()=>showScr('sM');
 document.getElementById('ob').onclick=()=>document.getElementById('op').classList.toggle('hid');
-document.getElementById('bPs').onclick=()=>setPause(!paused);
-document.getElementById('bSd').onclick=togMute;
-document.getElementById('bMn').onclick=()=>showScr('sM');
+document.getElementById('bPs').onclick=()=>{setPause(!paused);closeOptions();};
+document.getElementById('bSd').onclick=()=>{togMute();closeOptions();};
+document.getElementById('bMn').onclick=()=>{showScr('sM');closeOptions();};
 document.getElementById('bCfg').onclick=()=>{updRec();showScr('sCfg');};
 document.getElementById('bRec').onclick=()=>{updRec();showScr('sRec');};
 document.getElementById('bPrac').onclick=()=>{_prac=true;startGame('2p');};
+document.getElementById('bTr').onclick=()=>showScr('sTr');
 document.getElementById('bCfgBk').onclick=()=>showScr('sM');
 document.getElementById('bRecBk').onclick=()=>showScr('sM');
-document.getElementById('bClr').onclick=()=>{if(confirm('Borrar todos los récords?')){REC={j1:0,cpu:0,streak:0,tourney:0,goals:0};saveRec();updRec();}};
+document.getElementById('bPr').onclick=()=>{precM=!precM;document.getElementById('bPr').textContent='PRECISION '+(precM?'ON':'OFF');document.getElementById('bPr').classList.toggle('gr',precM);document.getElementById('bPr').classList.toggle('tf',!precM);};
+document.getElementById('bClr').onclick=()=>{if(confirm('Borrar todos los récords?')){REC={j1:0,cpu:0,streak:0,tourney:0,goals:0,names:[{name:'J1',score:0},{name:'J2',score:0}]};saveRec();updRec();}};
+document.querySelectorAll('#sName button[data-l]').forEach(btn=>btn.onclick=()=>addLetter(btn.dataset.l));
+document.getElementById('nOk').onclick=()=>{if(_nEntry.name.length<3)return alert('Ingresa 3 letras');var n=_nEntry.name;_nEntry.cb&&_nEntry.cb(n);showScr('sM');};
+document.getElementById('nDel').onclick=delLetter;
+document.getElementById('nCan').onclick=()=>{_nEntry.cb&&_nEntry.cb(null);showScr('sM');};
 document.getElementById('rngSpd').oninput=function(){padSpeed=parseFloat(this.value);document.getElementById('vPadVal').textContent=padSpeed.toFixed(1)+'x';};
 document.getElementById('rngDiff').oninput=function(){cD=['beginner','medium','hard','hardcore'][parseInt(this.value)];document.getElementById('dCfgVal').textContent=['PRINCIPIANTE','MEDIO','DIFICIL','ULTRA HC'][parseInt(this.value)];};
 document.getElementById('bTime').onclick=function(){timeMode=!timeMode;this.textContent=timeMode?'ON':'OFF';};
-document.getElementById('bRs').onclick=()=>startGame(cM,cD);
-function updRec(){document.getElementById('rJ1').textContent=REC.j1;document.getElementById('rCPU').textContent=REC.cpu;document.getElementById('rStreak').textContent=REC.streak;document.getElementById('rTourney').textContent=REC.tourney;document.getElementById('rGoals').textContent=REC.goals;}
+document.getElementById('bSm').onclick=togMute;
+document.getElementById('bRs').onclick=()=>{startGame(cM,cD);closeOptions();};
+function updRec(){document.getElementById('rJ1').textContent=REC.j1;document.getElementById('rCPU').textContent=REC.cpu;document.getElementById('rStreak').textContent=REC.streak;document.getElementById('rTourney').textContent=REC.tourney;document.getElementById('rGoals').textContent=REC.goals;var nTxt=REC.names.map(function(n){return n.name+': '+n.score;}).join(' | ');var nEl=document.getElementById('gpl');if(nEl)nEl.textContent=nTxt||'';}
+function checkRecord(who,score){
+  var idx=who==='p1'?0:1;
+  if(score>REC.names[idx].score){REC.names[idx].score=score;saveRec();startNameEntry(who,function(n){if(n){REC.names[idx].name=n;saveRec();updRec();}});}
+}
 showScr('sM');updRec();
 });
 </script>
