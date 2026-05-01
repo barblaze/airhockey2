@@ -20,6 +20,9 @@ jobs:
       - name: Install Dependencies
         run: npm install --no-package-lock
 
+      - name: Generate Assets
+        run: npx capacitor-assets generate
+
       - name: Prepare Web Assets
         run: |
           # Creamos la carpeta www y movemos todo lo necesario allí
