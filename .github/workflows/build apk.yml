@@ -42,31 +42,30 @@ jobs:
 
       - name: Generate Android Icons with ImageMagick
         run: |
-          sudo apt-get update && sudo apt-get install -y imagemagick
+          # Install ImageMagick if not present
+          if ! command -v convert &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y imagemagick
+          fi
+          # Create mipmap directories if they don't exist
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
             mkdir -p android/app/src/main/res/mipmap-${density}dpi
-            mkdir -p android/app/src/main/res/mipmap-${density}dpi-v26
-            mkdir -p android/app/src/main/res/drawable-${density}dpi
           done
+          # Generate icons from icon-512.png
           convert icon-512.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
           convert icon-512.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
           convert icon-512.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
           convert icon-512.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
           convert icon-512.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          # Copy same icons as round icons
           cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
           cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
           cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
           cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
           cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-          convert icon-512.png -resize 108x108 android/app/src/main/res/drawable-anydpi-v26/ic_launcher_foreground.png
-          convert -size 108x108 xc:"#FFFFFF" android/app/src/main/res/drawable-anydpi-v26/ic_launcher_background.png
-          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-            cp android/app/src/main/res/drawable-anydpi-v26/ic_launcher_foreground.png android/app/src/main/res/mipmap-${density}dpi-v26/ic_launcher_foreground.png
-            cp android/app/src/main/res/drawable-anydpi-v26/ic_launcher_background.png android/app/src/main/res/mipmap-${density}dpi-v26/ic_launcher_background.png
-          done
 
       - name: Set APK Name
         run: |
+          # Add archivesBaseName to build.gradle
           echo 'android { defaultConfig { setProperty("archivesBaseName", "AirHockey-PRO") } }' >> android/app/build.gradle
 
       - name: Build APK with Gradle
