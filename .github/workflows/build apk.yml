@@ -37,9 +37,6 @@ jobs:
       - name: Initialize Android Platform
         run: npx cap add android
 
-      - name: Sync Assets to Android
-        run: npx cap sync android
-
       - name: Prepare Assets for Icon Generation
         run: |
           mkdir -p assets
@@ -48,16 +45,19 @@ jobs:
       - name: Generate Assets for Android
         run: npx @capacitor/assets generate --android
 
-      - name: Set APK Name
-        run: |
-          # Use sed to add archivesBaseName inside the android block
-          sed -i '/^android {/a\    defaultConfig {\n        setProperty("archivesBaseName", "AirHockey-PRO")\n    }' android/app/build.gradle
+      - name: Sync Assets to Android
+        run: npx cap sync android
 
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+
+      - name: Rename APK
+        run: |
+          cd android/app/build/outputs/apk/debug
+          mv app-debug.apk AirHockey-PRO-debug.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
