@@ -20,14 +20,9 @@ jobs:
       - name: Install Dependencies
         run: npm install --no-package-lock
 
-      - name: Generate Assets
-        run: npx capacitor-assets generate
-
       - name: Prepare Web Assets
         run: |
-          # Creamos la carpeta www y movemos todo lo necesario allí
           mkdir -p www
-          # Copiamos index.html y manifest.json (y cualquier .js o .css que tengas)
           cp index.html www/ 2>/dev/null || true
           cp manifest.json www/ 2>/dev/null || true
           cp *.js www/ 2>/dev/null || true
@@ -42,6 +37,9 @@ jobs:
 
       - name: Initialize Android Platform
         run: npx cap add android
+
+      - name: Generate Assets
+        run: npx capacitor-assets generate
 
       - name: Sync Assets to Android
         run: npx cap sync android
