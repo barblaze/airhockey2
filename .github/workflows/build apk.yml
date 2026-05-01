@@ -39,7 +39,7 @@ jobs:
         run: npx cap add android
 
       - name: Generate Assets
-        run: npx capacitor-assets generate
+        run: npx @capacitor/assets generate
 
       - name: Sync Assets to Android
         run: npx cap sync android
