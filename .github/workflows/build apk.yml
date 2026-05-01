@@ -42,8 +42,8 @@ jobs:
           mkdir -p assets
           cp icon-512.png assets/icon-only.png
 
-      - name: Generate Assets
-        run: npx capacitor-assets generate
+      - name: Generate Assets for Android
+        run: npx @capacitor/assets generate --android
 
       - name: Sync Assets to Android
         run: npx cap sync android
