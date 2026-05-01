@@ -20,14 +20,6 @@ jobs:
       - name: Install Dependencies
         run: npm install --no-package-lock
 
-      - name: Prepare Assets for Icon Generation
-        run: |
-          mkdir -p assets
-          cp icon-512.png assets/icon-only.png
-
-      - name: Generate Assets
-        run: npx capacitor-assets generate
-
       - name: Prepare Web Assets
         run: |
           mkdir -p www
@@ -35,7 +27,6 @@ jobs:
           cp manifest.json www/ 2>/dev/null || true
           cp *.js www/ 2>/dev/null || true
           cp *.css www/ 2>/dev/null || true
-          cp -r assets www/ 2>/dev/null || true
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -45,6 +36,14 @@ jobs:
 
       - name: Initialize Android Platform
         run: npx cap add android
+
+      - name: Prepare Assets for Icon Generation
+        run: |
+          mkdir -p assets
+          cp icon-512.png assets/icon-only.png
+
+      - name: Generate Assets
+        run: npx capacitor-assets generate
 
       - name: Sync Assets to Android
         run: npx cap sync android
