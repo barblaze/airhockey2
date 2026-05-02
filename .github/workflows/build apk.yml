@@ -40,13 +40,51 @@ jobs:
       - name: Sync Assets to Android FIRST
         run: npx cap sync android
 
-      - name: Prepare Assets for Icon Generation
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
+      - name: Manual Icon Setup (Create structure + copy icons)
+        run: |
+          # Create mipmap directories for all densities
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            mkdir -p android/app/src/main/res/mipmap-${density}dpi
+          done
+
+          # Copy and resize icons from root to mipmap folders using ImageMagick
+          # Using icon-512.png from root as source
+          convert icon-512.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          convert icon-512.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          convert icon-512.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          convert icon-512.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          convert icon-512.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          # Create round icons (copy from regular icons)
+          cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+          cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+          cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+          cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+          echo "Icons copied and resized successfully"
+
+      - name: Update AndroidManifest.xml icon attribute
+        run: |
+          # Modify AndroidManifest.xml to point to @mipmap/ic_launcher
+          MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST_FILE" ]; then
+            # Use sed to update android:icon attribute to point to @mipmap/ic_launcher
+            sed -i 's/android:icon="@mipmap[^"]*"/android:icon="@mipmap/ic_launcher"/g' "$MANIFEST_FILE"
+            echo "AndroidManifest.xml updated: icon points to @mipmap/ic_launcher"
+            cat "$MANIFEST_FILE" | grep -i "android:icon"
+          else
+            echo "WARNING: AndroidManifest.xml not found"
+          fi
+
+      - name: Generate Assets for Android (AFTER sync to preserve icons)
         run: |
           mkdir -p assets
           cp icon-512.png assets/icon-only.png
-
-      - name: Generate Assets for Android (AFTER sync)
-        run: npx @capacitor/assets generate --android
+          npx @capacitor/assets generate --android
 
       - name: Build APK with Gradle
         run: |
