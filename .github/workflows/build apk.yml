@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK!
 
 on:
   push:
@@ -50,7 +50,7 @@ jobs:
             mkdir -p android/app/src/main/res/mipmap-${density}dpi
           done
 
-          # Copy and resize icons from root to mipmap folders using ImageMagick
+          # Copy and resize icons from root using ImageMagick
           # Using icon-512.png from root as source
           convert icon-512.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
           convert icon-512.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -69,22 +69,20 @@ jobs:
 
       - name: Update AndroidManifest.xml icon attribute
         run: |
-          # Modify AndroidManifest.xml to point to @mipmap/ic_launcher
-          MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
-          if [ -f "$MANIFEST_FILE" ]; then
-            # Use sed to update android:icon attribute to point to @mipmap/ic_launcher
-            sed -i 's/android:icon="@mipmap[^"]*"/android:icon="@mipmap/ic_launcher"/g' "$MANIFEST_FILE"
-            echo "AndroidManifest.xml updated: icon points to @mipmap/ic_launcher"
-            cat "$MANIFEST_FILE" | grep -i "android:icon"
+          # Find and update AndroidManifest.xml - try different possible locations
+          if [ -f "android/app/src/main/AndroidManifest.xml" ]; then
+            MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
+          elif [ -f "android/app/AndroidManifest.xml" ]; then
+            MANIFEST_FILE="android/app/AndroidManifest.xml"
           else
-            echo "WARNING: AndroidManifest.xml not found"
+            echo "WARNING: AndroidManifest.xml not found!"
+            exit 0  # Don't fail the build, just warn
           fi
-
-      - name: Generate Assets for Android (AFTER sync to preserve icons)
-        run: |
-          mkdir -p assets
-          cp icon-512.png assets/icon-only.png
-          npx @capacitor/assets generate --android
+          
+          # Use sed to update android:icon attribute to point to @mipmap/ic_launcher
+          sed -i 's/android:icon="@mipmap[^"]*"/android:icon="@mipmap/ic_launcher"/g' "$MANIFEST_FILE"
+          echo "AndroidManifest.xml updated: icon points to @mipmap/ic_launcher"
+          grep -i "android:icon" "$MANIFEST_FILE" || echo "Icon attribute not found in manifest"
 
       - name: Build APK with Gradle
         run: |
