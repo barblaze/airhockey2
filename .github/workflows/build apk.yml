@@ -1,4 +1,4 @@
-name: Build Android APK!
+name: Build Android APK
 
 on:
   push:
@@ -37,13 +37,13 @@ jobs:
       - name: Initialize Android Platform
         run: npx cap add android
 
-      - name: Sync Assets to Android FIRST
+      - name: Sync Assets to Android
         run: npx cap sync android
 
       - name: Install ImageMagick
         run: sudo apt-get update && sudo apt-get install -y imagemagick
 
-      - name: Manual Icon Setup (Create structure + copy icons)
+      - name: Manual Icon Setup
         run: |
           # Create mipmap directories for all densities
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
@@ -51,14 +51,13 @@ jobs:
           done
 
           # Copy and resize icons from root using ImageMagick
-          # Using icon-512.png from root as source
           convert icon-512.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
           convert icon-512.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
           convert icon-512.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
           convert icon-512.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
           convert icon-512.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
-          # Create round icons (copy from regular icons)
+          # Create round icons
           cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
           cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
           cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
@@ -66,23 +65,6 @@ jobs:
           cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
           echo "Icons copied and resized successfully"
-
-      - name: Update AndroidManifest.xml icon attribute
-        run: |
-          # Find and update AndroidManifest.xml - try different possible locations
-          if [ -f "android/app/src/main/AndroidManifest.xml" ]; then
-            MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
-          elif [ -f "android/app/AndroidManifest.xml" ]; then
-            MANIFEST_FILE="android/app/AndroidManifest.xml"
-          else
-            echo "WARNING: AndroidManifest.xml not found!"
-            exit 0  # Don't fail the build, just warn
-          fi
-          
-          # Use sed to update android:icon attribute to point to @mipmap/ic_launcher
-          sed -i 's/android:icon="@mipmap[^"]*"/android:icon="@mipmap/ic_launcher"/g' "$MANIFEST_FILE"
-          echo "AndroidManifest.xml updated: icon points to @mipmap/ic_launcher"
-          grep -i "android:icon" "$MANIFEST_FILE" || echo "Icon attribute not found in manifest"
 
       - name: Build APK with Gradle
         run: |
