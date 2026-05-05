@@ -25,6 +25,8 @@ jobs:
           mkdir -p www
           cp index.html www/ 2>/dev/null || true
           cp manifest.json www/ 2>/dev/null || true
+          cp icon-192.png www/ 2>/dev/null || true
+          cp icon-512.png www/ 2>/dev/null || true
           cp *.js www/ 2>/dev/null || true
           cp *.css www/ 2>/dev/null || true
 
@@ -44,7 +46,8 @@ jobs:
         run: |
           mkdir -p assets
           cp icon-512.png assets/icon-only.png
-          npx @capacitor/assets generate --android
+          cp icon-512.png assets/splash.png
+          npx @capacitor/assets generate --iconBackgroundColor '#04060f' --iconBackgroundColorDark '#04060f' --splashBackgroundColor '#04060f' --splashBackgroundColorDark '#04060f' --android
 
       - name: Build APK with Gradle
         run: |
