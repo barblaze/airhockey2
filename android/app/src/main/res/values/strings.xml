@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Air Hockey PRO</string>
+    <string name="title_activity_main">Air Hockey PRO</string>
+    <string name="package_name">com.akrosport.airhockey</string>
+    <string name="custom_url_scheme">com.akrosport.airhockey</string>
+</resources>
